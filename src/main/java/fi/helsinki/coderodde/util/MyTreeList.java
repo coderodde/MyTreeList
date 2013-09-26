@@ -52,7 +52,12 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
      */
     private final List<ListView> listViews;
 
-    private final int firstViewIndexInParentList;
+    /**
+     * The lowest list index in a parent list.
+     */
+    protected final int firstViewIndexInParentList;
+
+    protected MyTreeList<E> parent;
 
     public MyTreeList(final int degree) {
         this(degree, ORIGINAL);
@@ -138,21 +143,30 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
      * @return always <code>true</code>.
      */
     public boolean add(E e) {
-        size++;
-        modCount++;
-        if (last.size() == degree) {
-            Node<E> node = new Node<E>();
-            node.add(0, e);
-            last.right = node;
-            node.parent = last;
-            fixLeftCountersAfterInsertion(node);
-            fixTreeAfterAddition(node);
-            last = node;
-        } else {
-            fixLeftCountersAfterInsertion(last);
-            last.add(last.size(), e);
+        if (firstViewIndexInParentList == ORIGINAL) {
+            size++;
+            modCount++;
+            if (last.size() == degree) {
+                Node<E> node = new Node<E>();
+                node.add(0, e);
+                last.right = node;
+                node.parent = last;
+                fixLeftCountersAfterInsertion(node);
+                fixTreeAfterAddition(node);
+                last = node;
+            } else {
+                fixLeftCountersAfterInsertion(last);
+                last.add(last.size(), e);
+            }
+
+            for (ListView view : listViews) {
+                if (view.getLowestActualIndex() < size) {
+
+                }
+            }
+
+            return true;
         }
-        return true;
     }
 
     /**
@@ -189,10 +203,26 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
     }
 
     public E get(int index) {
-        checkIndex(index);
-        Node<E> node = root;
-        while (index != 0) {
-            if (left)
+        if (this.firstViewIndexInParentList == ORIGINAL) {
+            checkIndex(index);
+            if (isEmpty()) {
+                return null;
+            }
+            Node<E> node = root;
+            while (node != null) {
+                if (node.leftCount > index) { // 10 3
+                    index -= node.leftCount;
+                    node = node.left;
+                } else if (node.leftCount + node.size() < index) {
+                    index -= node.leftCount + node.size();
+                    node = node.right;
+                } else {
+                    return node.get(index);
+                }
+            }
+            return null;
+        } else {
+            return parent.get(this.firstViewIndexInParentList + index);
         }
     }
 
@@ -229,6 +259,10 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 && heightFieldsOK()
                 && isBalanced()
                 && isWellIndexed();
+    }
+
+    protected int getLowestActualIndex() {
+        return 0;
     }
 
     private void checkDegree(int degree) {
@@ -487,11 +521,11 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     private void checkIndex(int index) {
         if (index > 0) {
-            
+
         }
     }
 
-    private static class Node<E> {
+    private class Node<E> {
 
         /**
          * The internal storage arrays.
@@ -539,6 +573,10 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
          */
         int size() {
             return lastIndex - firstIndex + 1;
+        }
+
+        Node() {
+            array = new Object[MyTreeList.this.degree];
         }
 
         /**
@@ -635,9 +673,36 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
          */
         private final MyTreeList<E> parent;
 
-        ListView(final MyTreeList<E> parent, final int degree, final int firstIndex) {
+        /**
+         * The size of this view.
+         */
+        private int size;
+
+        /**
+         * Creates a new list view.
+         *
+         * @param parent the parent list.
+         * @param degree the degree of this view list.
+         * @param firstIndex the first index in parent.
+         */
+        ListView(final MyTreeList<E> parent,
+                 final int degree,
+                 final int firstIndex,
+                 final int size) {
             super(degree, firstIndex);
             this.parent = parent;
+            this.size = size;
+        }
+
+        @Override
+        public int size() {
+            return size;
+        }
+
+        @Override
+        protected int getLowestActualIndex() {
+            return this.firstViewIndexInParentList
+                   + parent.getLowestActualIndex();
         }
     }
 }
