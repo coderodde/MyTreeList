@@ -147,14 +147,16 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         modCount++;
         if (firstViewIndexInParentList == ORIGINAL) {
             if (last.size() == MyTreeList.this.degree) {
+                // Complexity: O(log N).
                 Node<E> node = new Node<E>();
                 node.add(0, e);
                 last.right = node;
                 node.parent = last;
                 last = node;
-                fixLeftCountersAfterInsertion(node);
                 fixTreeAfterAddition(node);
+                fixLeftCountersAfterInsertion(node);
             } else {
+                // Complexity: O(1).
                 last.add(last.size(), e);
             }
 
@@ -239,17 +241,16 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
             }
             Node<E> node = root;
             while (node != null) {
-                if (node.leftCount > index) { // 10 3
-                    index -= node.leftCount;
+                if (node.leftCount > index) {
                     node = node.left;
-                } else if (node.leftCount + node.size() < index) {
+                } else if (node.leftCount + node.size() >= index) {
                     index -= node.leftCount + node.size();
                     node = node.right;
                 } else {
                     return node.get(index);
                 }
             }
-            return null;
+            throw new IllegalStateException("Should never get here!");
         } else {
             return parent.get(this.firstViewIndexInParentList + index);
         }
@@ -281,6 +282,10 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     public List<E> subList(int fromIndex, int toIndex) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public String toString() {
+        return "[TreeList2, size: " + size() + "]";
     }
 
     public boolean isHealthy() {
@@ -325,7 +330,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
      */
     private void fixTreeAfterAddition(Node<E> node) {
         Node<E> p = node;
-        Node<E> pp = null;
+        Node<E> pp;
 
         while (p != null) {
             if (h(p.left) == h(p.right) + 2) {
@@ -366,11 +371,12 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 }
             }
 
-            p = pp; // move one edge upwards.
+            p.height = Math.max(h(p.left), h(p.right)) + 1; // set the height.
+            p = p.parent; // move one edge upwards.
         }
     }
 
-    private void fixAfterRemoval(Node<E> node) {
+    private void fixTreeAfterRemoval(Node<E> node) {
 
     }
 

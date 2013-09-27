@@ -46,6 +46,14 @@ public class App
         list.clear();
         System.out.println(list3.size());
         System.out.println(list3.isEmpty());
-
+        System.out.println("get()");
+        MyTreeList<Integer> list4 = new MyTreeList<Integer>(2);
+        for (int i = 0; i < 10; i++) {
+            list4.add(i);
+        }
+        System.out.println(list4.isHealthy());
+        for (int i = 0; i < 10; i++) {
+            System.out.println(list4.get(i));
+        }
     }
 }

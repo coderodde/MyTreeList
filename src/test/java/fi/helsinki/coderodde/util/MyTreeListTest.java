@@ -142,7 +142,14 @@ public class MyTreeListTest {
      */
     @Test
     public void testGet() {
+        MyTreeList<Integer> list = new MyTreeList<Integer>(2);
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
 
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i, (int) list.get(i));
+        }
     }
 
     /**
@@ -199,6 +206,6 @@ public class MyTreeListTest {
      */
     @Test
     public void testIndexOf() {
-        
+
     }
 }
