@@ -28,6 +28,15 @@ public class MyTreeListTest {
      */
     @Test
     public void testIsEmpty() {
+        MyTreeList<Integer> list = new MyTreeList<Integer>(2);
+
+        assertTrue(list.isEmpty());
+        assertTrue(list.isHealthy());
+
+        list.add(1);
+
+        assertFalse(list.isEmpty());
+        assertTrue(list.isHealthy());
     }
 
     /**
@@ -35,6 +44,12 @@ public class MyTreeListTest {
      */
     @Test
     public void testContains() {
+        String yo = "Hello, y'all!";
+        String sayonara = "Gomen nasai, demoo sayonara, ahondara! ^^";
+        MyTreeList<String> list = new MyTreeList<String>(1);
+        list.add(yo);
+        assertTrue(list.contains(yo));
+        assertFalse(list.contains(sayonara));
     }
 
     /**

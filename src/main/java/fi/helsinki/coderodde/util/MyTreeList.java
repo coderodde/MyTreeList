@@ -143,9 +143,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
      * @return always <code>true</code>.
      */
     public boolean add(E e) {
+        size++;
+        modCount++;
         if (firstViewIndexInParentList == ORIGINAL) {
-            size++;
-            modCount++;
             if (last.size() == degree) {
                 Node<E> node = new Node<E>();
                 node.add(0, e);
@@ -158,24 +158,42 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 fixLeftCountersAfterInsertion(last);
                 last.add(last.size(), e);
             }
-
-            for (ListView view : listViews) {
-                if (view.getLowestActualIndex() < size) {
-
+            for (int i = 0, end = listViews.size(); i < end; i++) {
+                ListView view = listViews.get(0);
+                if (view.getLowestActualIndex() <= size
+                        && size < view.getLowestActualIndex() + view.size()) {
+                    view.size++;
                 }
             }
-
+            if (map.containsKey(e)) {
+                List<Node<E>> nodes = this.map.get(e);
+                if (nodes.get(nodes.size() - 1) != last) {
+                    nodes.add(last);
+                }
+            } else {
+                List<Node<E>> list = new ArrayList<Node<E>>(1);
+                list.add(last);
+                map.put(e, list);
+            }
+            return true;
+        } else {
+            parent.add(firstViewIndexInParentList + size() - 1, e);
             return true;
         }
     }
 
     /**
-     * Removes the first element of
+     * Removes the first occurrence of an element.
      * @param o
      * @return
      */
     public boolean remove(Object o) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        List<Node<E>> nodes = map.get(o);
+        if (nodes == null) {
+            return false;
+        }
+
+        return true;
     }
 
     public boolean containsAll(Collection<?> c) {
@@ -199,7 +217,18 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
     }
 
     public void clear() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        modCount++;
+        size = 0;
+        root.left = null;
+        root.right = null;
+        root.leftCount = 0;
+        root.firstIndex = 0;
+        root.lastIndex = 0;
+        root.height = 0;
+
+        for (int i = 0, end = listViews.size(); i < end; i++) {
+            listViews.get(i).clear();
+        }
     }
 
     public E get(int index) {
@@ -508,7 +537,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     private boolean isWellIndexed() {
         return root.leftCount == countLeft(root.left)
-              && (size - root.leftCount - root.size() == countLeft(root.right));
+                && root.right != null ? root.right.leftCount == countLeft(root.right) : true;
     }
 
     private void checkFirstIndex(int firstViewIndexInParentList) {
@@ -695,8 +724,18 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         }
 
         @Override
+        public void clear() {
+            this.size = 0;
+        }
+
+        @Override
         public int size() {
             return size;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return size == 0;
         }
 
         @Override
