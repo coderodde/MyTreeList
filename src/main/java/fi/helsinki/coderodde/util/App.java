@@ -8,7 +8,7 @@ public class App
 {
     public static void main( String[] args )
     {
-        MyTreeList<Integer> list = new MyTreeList<Integer>(2);
+        MyTreeList<Integer> list = new MyTreeList<Integer>(1);
 
         System.out.println(list.isEmpty());
         boolean b = list.isHealthy();
@@ -30,5 +30,22 @@ public class App
         list2.add(yo);
         System.out.println(list2.contains(yo));
         System.out.println(list2.contains(sayonara));
+
+        System.out.println("clear and size()");
+        list2.clear();
+        System.out.println(list2.isEmpty());
+        System.out.println(list2.isHealthy());
+        System.out.println(list2.size());
+
+        System.out.println("---");
+        MyTreeList<Integer> list3 = new MyTreeList<Integer>(1);
+        for (int i = 0; i < 10; i++) {
+            list3.add(i);
+        }
+        System.out.println(list3.size());
+        list.clear();
+        System.out.println(list3.size());
+        System.out.println(list3.isEmpty());
+
     }
 }

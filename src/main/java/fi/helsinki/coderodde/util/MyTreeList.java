@@ -146,18 +146,18 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         size++;
         modCount++;
         if (firstViewIndexInParentList == ORIGINAL) {
-            if (last.size() == degree) {
+            if (last.size() == MyTreeList.this.degree) {
                 Node<E> node = new Node<E>();
                 node.add(0, e);
                 last.right = node;
                 node.parent = last;
+                last = node;
                 fixLeftCountersAfterInsertion(node);
                 fixTreeAfterAddition(node);
-                last = node;
             } else {
-                fixLeftCountersAfterInsertion(last);
                 last.add(last.size(), e);
             }
+
             for (int i = 0, end = listViews.size(); i < end; i++) {
                 ListView view = listViews.get(0);
                 if (view.getLowestActualIndex() <= size
@@ -601,7 +601,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
          * @return the amount of elements in this node.
          */
         int size() {
-            return lastIndex - firstIndex + 1;
+            return lastIndex - firstIndex;
         }
 
         Node() {
@@ -614,8 +614,8 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
          * @param element the element to set.
          */
         void add(int localIndex, E element) {
-            final int elementsBefore = localIndex - firstIndex;
-            final int elementsAfter = lastIndex - localIndex - 1;
+            final int elementsBefore = localIndex;
+            final int elementsAfter = lastIndex - this.size() - localIndex;
 
             if (elementsBefore < elementsAfter && firstIndex > 0) {
                 // shift preceding elements to the left.
@@ -623,15 +623,16 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                     array[i - 1] = array[i];
                 }
                 firstIndex--;
+                array[firstIndex + elementsBefore] = element;
             } else {
                 // shift consequent elements to the right.
                 for (int i = lastIndex; i > lastIndex - elementsAfter; i--) {
-                    array[i + 1] = array[i];
+                    array[i] = array[i - 1];
                 }
-                lastIndex++;
+                array[firstIndex + elementsBefore] = element;
             }
 
-            array[firstIndex + elementsBefore] = element;
+            lastIndex++;
         }
 
         /**

@@ -127,6 +127,14 @@ public class MyTreeListTest {
      */
     @Test
     public void testClear() {
+        MyTreeList<Integer> list = new MyTreeList<Integer>(1);
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+        assertEquals(10, list.size());
+        list.clear();
+        assertEquals(0, list.size());
+        assertTrue(list.isEmpty());
     }
 
     /**
@@ -134,6 +142,7 @@ public class MyTreeListTest {
      */
     @Test
     public void testGet() {
+
     }
 
     /**
@@ -186,16 +195,10 @@ public class MyTreeListTest {
     }
 
     /**
-     * Test of isHealthy method, of class MyTreeList.
-     */
-    @Test
-    public void testIsHealthy() {
-    }
-
-    /**
      * Test of indexOf method, of class MyTreeList.
      */
     @Test
     public void testIndexOf() {
+        
     }
 }
