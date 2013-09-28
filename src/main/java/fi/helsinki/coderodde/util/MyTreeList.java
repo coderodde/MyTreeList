@@ -198,7 +198,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         modCount++;
         firstNode.removeAt(indexOf(o));
         if (firstNode.size() == 0) {
-            removeNode(firstNode);
+            Node<E> node = removeNode(firstNode);
+            Node<E> p = node.parent;
+            fixTreeAfterRemoval(node);
         }
         return true;
     }
@@ -327,17 +329,8 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         return index;
     }
 
-//    private E remove(Object o) {
-//        if (map.containsKey(o) == false) {
-//            return null;
-//        }
-//
-//        Node<E> first = map.get(o).get(0);
-//        return null;
-//    }
-
     /**
-     * Rebalances this tree if needed.
+     * Rebalances this tree if need be.
      *
      * @param node
      */
@@ -620,7 +613,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
             Node<E> p = node.parent;
 
             if (p == null) {
-                return null;
+                return node;
             }
 
             if (node == p.left) {
@@ -641,11 +634,11 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 pp = pp.parent;
             }
 
-            return null;
+            return node;
         }
 
         // Only one of the two will return true.
-        if (node.left == null && node.right == null) {
+        if (node.left == null || node.right == null) {
             // Case: only one child.
             Node<E> child = node.left != null ? node.left : node.right;
             Node<E> p = node.parent;
@@ -671,7 +664,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 p = p.parent;
             }
 
-            return null;
+            return node;
         }
 
         // Case: two children.

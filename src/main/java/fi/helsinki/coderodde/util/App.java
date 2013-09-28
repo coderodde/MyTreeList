@@ -56,5 +56,20 @@ public class App
             System.out.println(list4.get(i));
         }
         System.out.println(list4.isHealthy());
+
+        System.out.println("remove(Object)");
+        MyTreeList<Integer> list5 = new MyTreeList<Integer>(2);
+
+        for (int i = 0; i < 6; i++) {
+            list5.add(i);
+        }
+
+        list5.remove((Integer) 2);
+        list5.remove((Integer) 3);
+        list5.remove((Integer) 5);
+        list5.remove((Integer) 4);
+        list5.remove((Integer) 1);
+        list5.remove((Integer) 0);
+        System.out.println(list5.isHealthy());
     }
 }

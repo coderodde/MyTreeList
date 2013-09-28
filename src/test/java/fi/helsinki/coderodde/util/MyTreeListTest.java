@@ -4,6 +4,9 @@
  */
 package fi.helsinki.coderodde.util;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Random;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -99,6 +102,100 @@ public class MyTreeListTest {
         assertTrue(list.remove((Integer) 2));
         assertEquals(4, list.size());
         assertTrue(list.isHealthy());
+        assertFalse(list.remove((Integer) 6));
+        assertTrue(list.isHealthy());
+        assertTrue(list.remove((Integer) 4));
+        assertTrue(list.isHealthy());
+        assertTrue(list.remove((Integer) 5));
+        assertTrue(list.isHealthy());
+        assertTrue(list.remove((Integer) 1));
+        assertTrue(list.isHealthy());
+        assertTrue(list.remove((Integer) 0));
+//        assertTrue(list.isHealthy());
+        assertTrue(list.isEmpty());
+    }
+
+    @Test
+    public void testAddPerformance() {
+        final int N = 10000;
+        LinkedList<Integer> linkedList = new LinkedList<Integer>();
+        ArrayList<Integer> arrayList = new ArrayList<Integer>();
+        MyTreeList<Integer> treeList = new MyTreeList<Integer>(10);
+
+        long ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            linkedList.add(i);
+        }
+        long tb = System.currentTimeMillis();
+
+        System.out.println("LinkedList.add(): " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            arrayList.add(i);
+        }
+        tb = System.currentTimeMillis();
+
+        System.out.println("ArrayList.add():   " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            treeList.add(i);
+        }
+        tb = System.currentTimeMillis();
+
+        System.out.println("TreeList.add():    " + (tb - ta) + " ms.");
+    }
+
+    @Test
+    public void testRemoveObjectPerformance() {
+        final int N = 10000;
+        LinkedList<Integer> linkedList = new LinkedList<Integer>();
+        ArrayList<Integer> arrayList = new ArrayList<Integer>();
+        MyTreeList<Integer> treeList = new MyTreeList<Integer>(10);
+
+        for (int i = 0; i < N; i++) {
+            linkedList.add(i);
+            arrayList.add(i);
+            treeList.add(i);
+        }
+
+        Random r = new Random();
+        Integer[] query = new Integer[N];
+        for (int i = 0; i < N; i++) {
+            query[i] = i;
+        }
+
+        for (int i = 0; i < N; i++) {
+            int from = r.nextInt(N);
+            int to = r.nextInt(N);
+            Integer tmp = query[from];
+            query[from] = query[to];
+            query[to] = tmp;
+        }
+
+        long ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            linkedList.remove((Integer) query[i]);
+        }
+        long tb = System.currentTimeMillis();
+        System.out.println("LinkedList.remove(Object): " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            arrayList.remove((Integer) query[i]);
+        }
+        tb = System.currentTimeMillis();
+        System.out.println("ArrayList.remove(Object):   " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            treeList.remove((Integer) query[i]);
+        }
+        tb = System.currentTimeMillis();
+        System.out.println("TreeList.remove(Object):    " + (tb - ta) + " ms.");
+
+        assertTrue(treeList.isHealthy());
     }
 
     /**
