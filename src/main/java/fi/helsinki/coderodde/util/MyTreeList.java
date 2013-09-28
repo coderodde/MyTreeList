@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -16,47 +17,40 @@ import java.util.RandomAccess;
 public class MyTreeList<E> implements List<E>, RandomAccess {
 
     public static final int ORIGINAL = -1;
-
     /**
      * The maximum amount of elements per a node.
      */
     private final int degree;
-
     /**
      * The root node, never null;
      */
     protected Node<E> root;
-
     /**
-     * The total amount of elements in this <code>TreeList</code>.
+     * The total amount of elements in this
+     * <code>TreeList</code>.
      */
     private int size;
-
     /**
      * The modification count.
      */
     private long modCount;
-
     /**
-     * The last (rightmost) node of this <code>TreeList</code>.
+     * The last (rightmost) node of this
+     * <code>TreeList</code>.
      */
     private Node<E> last;
-
     /**
      * Maps an element to list of nodes containing the element.
      */
-    private final Map<E, List<Node<E>>> map;
-
+    private final Map<E, LinkedList<Node<E>>> map;
     /**
      * The list of all list views.
      */
     private final List<ListView> listViews;
-
     /**
      * The lowest list index in a parent list.
      */
     protected final int firstViewIndexInParentList;
-
     protected MyTreeList<E> parent;
 
     public MyTreeList(final int degree) {
@@ -68,7 +62,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         checkFirstIndex(firstViewIndexInParentList);
         this.degree = degree;
         this.listViews = new ArrayList<ListView>();
-        this.map = new HashMap<E, List<Node<E>>>();
+        this.map = new HashMap<E, LinkedList<Node<E>>>();
         this.root = new Node<E>();
         this.last = this.root;
         this.firstViewIndexInParentList = firstViewIndexInParentList;
@@ -173,9 +167,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                     nodes.add(last);
                 }
             } else {
-                List<Node<E>> list = new ArrayList<Node<E>>(1);
-                list.add(last);
-                map.put(e, list);
+                LinkedList<Node<E>> list = new LinkedList<Node<E>>();
+                list.add(last);   // append last to list.
+                map.put(e, list); // store the list.
             }
             return true;
         } else {
@@ -186,15 +180,21 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     /**
      * Removes the first occurrence of an element.
+     *
      * @param o
      * @return
      */
+    @Override
     public boolean remove(Object o) {
-        List<Node<E>> nodes = map.get(o);
+        LinkedList<Node<E>> nodes = map.get(o);
         if (nodes == null) {
             return false;
         }
-
+        final Node<E> firstNode = nodes.removeFirst();
+        firstNode.removeAt(indexOf(o));
+        if (firstNode.size() == 0) {
+            removeNode(firstNode);
+        }
         return true;
     }
 
@@ -322,6 +322,15 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         return index;
     }
 
+//    private E remove(Object o) {
+//        if (map.containsKey(o) == false) {
+//            return null;
+//        }
+//
+//        Node<E> first = map.get(o).get(0);
+//        return null;
+//    }
+
     /**
      * Rebalances this tree if needed.
      *
@@ -335,9 +344,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
             if (h(p.left) == h(p.right) + 2) {
                 pp = p.parent;
                 Node<E> subroot =
-                        h(p.left.left) >= h(p.left.right) ?
-                        rightRotate(p) :
-                        leftRightRotate(p);
+                        h(p.left.left) >= h(p.left.right)
+                        ? rightRotate(p)
+                        : leftRightRotate(p);
 
                 if (pp == null) {
                     root = subroot;
@@ -353,9 +362,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
             } else if (h(p.left) + 2 == h(p.right)) {
                 pp = p.parent;
                 Node<E> subroot =
-                        h(p.right.right) >= h(p.right.left) ?
-                        leftRotate(p) :
-                        rightLeftRotate(p);
+                        h(p.right.right) >= h(p.right.left)
+                        ? leftRotate(p)
+                        : rightLeftRotate(p);
 
                 if (pp == null) {
                     root = subroot;
@@ -376,8 +385,45 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
     }
 
     private void fixTreeAfterRemoval(Node<E> node) {
+        Node<E> p = node;
 
+        while (p != null) {
+            Node<E> subroot;
+            Node<E> pp = p.parent;
+            boolean left = (pp == null || pp.left == p);
+
+            if (h(p.left) == h(p.right) + 2) {
+                if (h(p.left.left) < h(p.left.right)) {
+                    subroot = leftRightRotate(p);
+                } else {
+                    subroot = rightRotate(p);
+                }
+            } else if (h(p.left) + 2 == h(p.right)) {
+                if (h(p.right.right) < h(p.right.left)) {
+                    subroot = rightLeftRotate(p); //?
+                } else {
+                    subroot = leftRotate(p);
+                }
+            } else {
+                p.height = Math.max(h(p.left), h(p.right)) + 1;
+                p = pp;
+                continue;
+            }
+
+            if (p == root) {
+                root = subroot;
+            }
+
+            if (left) {
+                pp.left = subroot;
+            } else {
+                pp.right = subroot;
+            }
+
+            p = pp;
+        }
     }
+
 
     /**
      * Fixes the left counters on the path to root.
@@ -552,7 +598,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
             throw new IllegalArgumentException(
                     "Bad firstViewIndexInParentList: "
                     + firstViewIndexInParentList);
-        }
+
+
+}
     }
 
     private void checkIndex(int index) {
@@ -561,195 +609,296 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         }
     }
 
+    private Node<E> removeNode(Node<E> node) {
+        if (node.left == null && node.right == null) {
+            // Case: the removed node has no children.
+            Node<E> p = node.parent;
+
+            if (p == null) {
+                return null;
+            }
+
+            if (node == p.left) {
+                p.left = null;
+                p.leftCount = 0;
+            } else {
+                p.right = null;
+            }
+
+            Node<E> pp = p.parent;
+
+            while (pp != null) {
+                if (pp.left == p) {
+                    pp.leftCount--;
+                }
+
+                p = pp;
+                pp = pp.parent;
+            }
+
+            return null;
+        }
+
+        // Only one of the two will return true.
+        if (node.left == null && node.right == null) {
+            // Case: only one child.
+            Node<E> child = node.left != null ? node.left : node.right;
+            Node<E> p = node.parent;
+            child.parent = p;
+
+            if (p == null) {
+                root = child;
+                return null;
+            }
+
+            if (node == p.left) {
+                p.left = child;
+            } else {
+                p.right = child;
+            }
+
+            while (p != null) {
+                if (p.left == child) {
+                    p.leftCount--;
+                }
+
+                child = p;
+                p = p.parent;
+            }
+
+            return null;
+        }
+
+        // Case: two children.
+        Node<E> successor = node.right.min();
+        Node<E> child = successor.right;
+        Node<E> p = successor.parent;
+
+        if (p.left == successor) {
+            p.left = child;
+        } else {
+            p.right = child;
+        }
+
+        if (child != null) {
+            child.parent = p;
+        }
+
+        Node<E> pp = p.parent;
+        Node<E> pLo = child;
+
+        while (p != null) {
+            if (p.left == pLo) {
+                p.leftCount--;
+            }
+
+            pLo = p;
+            p = p.parent;
+        }
+
+        return successor;
+    }
+
     private class Node<E> {
 
-        /**
-         * The internal storage arrays.
-         */
-        Object[] array;
+    /**
+     * The internal storage arrays.
+     */
+    Object[] array;
+    /**
+     * The total amount of elements in the left subtree.
+     */
+    int leftCount;
+    /**
+     * The index of the first element in
+     * <code>array</code>.
+     */
+    int firstIndex;
+    /**
+     * The index of the last element in
+     * <code>array</code>.
+     */
+    int lastIndex;
+    /**
+     * The left subtree.
+     */
+    Node<E> left;
+    /**
+     * The right subtree.
+     */
+    Node<E> right;
+    /**
+     * The parent node.
+     */
+    Node<E> parent;
+    /**
+     * The height of this node.
+     */
+    int height;
 
-        /**
-         * The total amount of elements in the left subtree.
-         */
-        int leftCount;
+    /**
+     * Returns the amount of elements in this node.
+     *
+     * @return the amount of elements in this node.
+     */
+    int size() {
+        return lastIndex - firstIndex;
+    }
 
-        /**
-         * The index of the first element in <code>array</code>.
-         */
-        int firstIndex;
+    Node() {
+        array = new Object[MyTreeList.this.degree];
+    }
 
-        /**
-         * The index of the last element in <code>array</code>.
-         */
-        int lastIndex;
+    /**
+     * Assigns the element to the local node localIndex
+     * <code>localIndex</code>.
+     *
+     * @param localIndex the local localIndex within this <code>Node</code>'s
+     * array.
+     * @param element the element to set.
+     */
+    void add(int localIndex, E element) {
+        final int elementsBefore = localIndex;
+        final int elementsAfter = lastIndex - this.size() - localIndex;
 
-        /**
-         * The left subtree.
-         */
-        Node<E> left;
-
-        /**
-         * The right subtree.
-         */
-        Node<E> right;
-
-        /**
-         * The parent node.
-         */
-        Node<E> parent;
-
-        /**
-         * The height of this node.
-         */
-        int height;
-
-        /**
-         * Returns the amount of elements in this node.
-         * @return the amount of elements in this node.
-         */
-        int size() {
-            return lastIndex - firstIndex;
-        }
-
-        Node() {
-            array = new Object[MyTreeList.this.degree];
-        }
-
-        /**
-         * Assigns the element to the local node localIndex <code>localIndex</code>.
-         * @param localIndex the local localIndex within this <code>Node</code>'s array.
-         * @param element the element to set.
-         */
-        void add(int localIndex, E element) {
-            final int elementsBefore = localIndex;
-            final int elementsAfter = lastIndex - this.size() - localIndex;
-
-            if (elementsBefore < elementsAfter && firstIndex > 0) {
-                // shift preceding elements to the left.
-                for (int i = firstIndex; i < firstIndex + elementsBefore; i++) {
-                    array[i - 1] = array[i];
-                }
-                firstIndex--;
-                array[firstIndex + elementsBefore] = element;
-            } else {
-                // shift consequent elements to the right.
-                for (int i = lastIndex; i > lastIndex - elementsAfter; i--) {
-                    array[i] = array[i - 1];
-                }
-                array[firstIndex + elementsBefore] = element;
+        if (elementsBefore < elementsAfter && firstIndex > 0) {
+            // shift preceding elements to the left.
+            for (int i = firstIndex; i < firstIndex + elementsBefore; i++) {
+                array[i - 1] = array[i];
             }
-
-            lastIndex++;
-        }
-
-        /**
-         * Sets the new value at index <code>localIndex</code>.
-         *
-         * @param localIndex the index in this node to set at.
-         * @param newValue the new value.
-         * @return old value.
-         */
-        E set(int localIndex, E newValue) {
-            E old = (E) array[firstIndex + localIndex];
-            array[firstIndex + localIndex] = newValue;
-            return old;
-        }
-
-        /**
-         * Get an element at <code>localIndex</code>.
-         *
-         * @param localIndex
-         * @return
-         */
-        E get(int localIndex) {
-            return (E) array[firstIndex + localIndex];
-        }
-
-        /**
-         * Removes an element from this node.
-         *
-         * @param localIndex
-         */
-        void removeAt(int localIndex) {
-            final int elementsBefore = localIndex - firstIndex;
-            final int elementsAfter = lastIndex - localIndex - 1;
-
-            if (elementsBefore < elementsAfter) {
-                // shift preceding elements to the right.
-                for (int i = firstIndex + localIndex; i > firstIndex; i--) {
-                    array[i] = array[i - 1];
-                }
-                array[firstIndex] = null;
-                firstIndex++;
-            } else {
-                // shift subsequent elements to the left.
-                for (int i = lastIndex - 1; i > lastIndex - elementsAfter; i--) {
-                    array[i - 1] = array[i];
-                }
-                array[lastIndex - 1] = null;
-                lastIndex--;
+            firstIndex--;
+            array[firstIndex + elementsBefore] = element;
+        } else {
+            // shift consequent elements to the right.
+            for (int i = lastIndex; i > lastIndex - elementsAfter; i--) {
+                array[i] = array[i - 1];
             }
+            array[firstIndex + elementsBefore] = element;
         }
 
-        int indexOf(final Object o) {
-            if (size() > 0) {
-                for (int i = firstIndex; i < lastIndex; i++) {
-                    if (o.equals(array[i])) {
-                        return i - firstIndex;
-                    }
-                }
+        lastIndex++;
+    }
+
+    /**
+     * Sets the new value at index
+     * <code>localIndex</code>.
+     *
+     * @param localIndex the index in this node to set at.
+     * @param newValue the new value.
+     * @return old value.
+     */
+    E set(int localIndex, E newValue) {
+        E old = (E) array[firstIndex + localIndex];
+        array[firstIndex + localIndex] = newValue;
+        return old;
+    }
+
+    /**
+     * Get an element at
+     * <code>localIndex</code>.
+     *
+     * @param localIndex
+     * @return
+     */
+    E get(int localIndex) {
+        return (E) array[firstIndex + localIndex];
+    }
+
+    /**
+     * Removes an element from this node.
+     *
+     * @param localIndex
+     */
+    void removeAt(int localIndex) {
+        final int elementsBefore = localIndex - firstIndex;
+        final int elementsAfter = lastIndex - localIndex - 1;
+
+        if (elementsBefore < elementsAfter) {
+            // shift preceding elements to the right.
+            for (int i = firstIndex + localIndex; i > firstIndex; i--) {
+                array[i] = array[i - 1];
             }
-            return -1;
+            array[firstIndex] = null;
+            firstIndex++;
+        } else {
+            // shift subsequent elements to the left.
+            for (int i = lastIndex - 1; i > lastIndex - elementsAfter; i--) {
+                array[i - 1] = array[i];
+            }
+            array[lastIndex - 1] = null;
+            lastIndex--;
         }
     }
 
-    private class ListView extends MyTreeList<E> {
-
-        /**
-         * The tree list this <code>ListView</code> follows.
-         */
-        private final MyTreeList<E> parent;
-
-        /**
-         * The size of this view.
-         */
-        private int size;
-
-        /**
-         * Creates a new list view.
-         *
-         * @param parent the parent list.
-         * @param degree the degree of this view list.
-         * @param firstIndex the first index in parent.
-         */
-        ListView(final MyTreeList<E> parent,
-                 final int degree,
-                 final int firstIndex,
-                 final int size) {
-            super(degree, firstIndex);
-            this.parent = parent;
-            this.size = size;
+    int indexOf(final Object o) {
+        if (size() > 0) {
+            for (int i = firstIndex; i < lastIndex; i++) {
+                if (o.equals(array[i])) {
+                    return i - firstIndex;
+                }
+            }
         }
+        return -1;
+    }
 
-        @Override
-        public void clear() {
-            this.size = 0;
-        }
+        private Node<E> min() {
+            Node<E> node = this;
 
-        @Override
-        public int size() {
-            return size;
-        }
+            while (node.left != null) {
+                node = node.left;
+            }
 
-        @Override
-        public boolean isEmpty() {
-            return size == 0;
-        }
-
-        @Override
-        protected int getLowestActualIndex() {
-            return this.firstViewIndexInParentList
-                   + parent.getLowestActualIndex();
+            return node;
         }
     }
+
+private class ListView extends MyTreeList<E> {
+
+    /**
+     * The tree list this
+     * <code>ListView</code> follows.
+     */
+    private final MyTreeList<E> parent;
+    /**
+     * The size of this view.
+     */
+    private int size;
+
+    /**
+     * Creates a new list view.
+     *
+     * @param parent the parent list.
+     * @param degree the degree of this view list.
+     * @param firstIndex the first index in parent.
+     */
+    ListView(final MyTreeList<E> parent,
+            final int degree,
+            final int firstIndex,
+            final int size) {
+        super(degree, firstIndex);
+        this.parent = parent;
+        this.size = size;
+    }
+
+    @Override
+    public void clear() {
+        this.size = 0;
+    }
+
+    @Override
+    public int size() {
+        return size;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @Override
+    protected int getLowestActualIndex() {
+        return this.firstViewIndexInParentList
+                + parent.getLowestActualIndex();
+    }
+}
 }
