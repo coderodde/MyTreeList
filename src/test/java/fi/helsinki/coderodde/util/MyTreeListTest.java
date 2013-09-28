@@ -152,7 +152,7 @@ public class MyTreeListTest {
         final int N = 10000;
         LinkedList<Integer> linkedList = new LinkedList<Integer>();
         ArrayList<Integer> arrayList = new ArrayList<Integer>();
-        MyTreeList<Integer> treeList = new MyTreeList<Integer>(10);
+        MyTreeList<Integer> treeList = new MyTreeList<Integer>(100);
 
         for (int i = 0; i < N; i++) {
             linkedList.add(i);
