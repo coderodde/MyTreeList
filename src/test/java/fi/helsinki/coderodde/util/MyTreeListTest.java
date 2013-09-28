@@ -7,6 +7,7 @@ package fi.helsinki.coderodde.util;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+import org.apache.commons.collections.list.TreeList;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -111,7 +112,7 @@ public class MyTreeListTest {
         assertTrue(list.remove((Integer) 1));
         assertTrue(list.isHealthy());
         assertTrue(list.remove((Integer) 0));
-//        assertTrue(list.isHealthy());
+        assertTrue(list.isHealthy());
         assertTrue(list.isEmpty());
     }
 
