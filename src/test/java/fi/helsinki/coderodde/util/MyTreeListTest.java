@@ -220,8 +220,74 @@ public class MyTreeListTest {
         }
         tb = System.currentTimeMillis();
         System.out.println("TreeList.remove(Object):    " + (tb - ta) + " ms.");
+
+        assertTrue(treeList.isEmpty());
+        assertTrue(treeList.isHealthy());
     }
 
+    /**
+     * Performance test of contains method, of class MyTreeList
+     */
+    @Test
+    public void testContainsPerformance() {
+        LinkedList<Integer> linkedList = new LinkedList<Integer>();
+        ArrayList<Integer> arrayList = new ArrayList<Integer>();
+        MyTreeList<Integer> treeList = new MyTreeList<Integer>(100);
+        TreeList enemyList = new TreeList();
+
+        for (int i = 0; i < 10000; i++) {
+            linkedList.add(i);
+            arrayList.add(i);
+            treeList.add(i);
+            enemyList.add(i);
+        }
+
+        long seed = System.currentTimeMillis();
+        System.out.println("Seed: " + seed);
+        Random r = new Random(seed);
+
+        long ta = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            int j = r.nextInt(10000);
+            assertTrue(linkedList.contains(j));
+        }
+        long tb = System.currentTimeMillis();
+
+        System.out.println("LinkedList.contains(): " + (tb - ta) + " ms.");
+
+        r = new Random(seed);
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            int j = r.nextInt(10000);
+            assertTrue(arrayList.contains(j));
+        }
+        tb = System.currentTimeMillis();
+
+        System.out.println("ArrayList.contains():  " + (tb - ta) + " ms.");
+
+        r = new Random(seed);
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            int j = r.nextInt(10000);
+            assertTrue(treeList.contains(j));
+        }
+        tb = System.currentTimeMillis();
+
+        System.out.println("MyTreeList.contains():  " + (tb - ta) + " ms.");
+
+        r = new Random(seed);
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < 10000; i++) {
+            int j = r.nextInt(10000);
+            assertTrue(enemyList.contains(j));
+        }
+        tb = System.currentTimeMillis();
+
+        System.out.println("TreeList.contains():    " + (tb - ta) + " ms.");
+    }
     /**
      * Test of containsAll method, of class MyTreeList.
      */
