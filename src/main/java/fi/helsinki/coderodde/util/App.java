@@ -55,5 +55,6 @@ public class App
         for (int i = 0; i < 10; i++) {
             System.out.println(list4.get(i));
         }
+        System.out.println(list4.isHealthy());
     }
 }

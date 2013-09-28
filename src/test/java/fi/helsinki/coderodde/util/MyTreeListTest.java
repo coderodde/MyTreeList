@@ -21,6 +21,7 @@ public class MyTreeListTest {
         list.add("Hello");
         list.add("World");
         assertEquals(2, list.size());
+        assertTrue(list.isHealthy());
     }
 
     /**
@@ -132,9 +133,11 @@ public class MyTreeListTest {
             list.add(i);
         }
         assertEquals(10, list.size());
+        assertTrue(list.isHealthy());
         list.clear();
         assertEquals(0, list.size());
         assertTrue(list.isEmpty());
+        assertTrue(list.isHealthy());
     }
 
     /**

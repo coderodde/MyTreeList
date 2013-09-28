@@ -542,7 +542,9 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     private boolean isWellIndexed() {
         return root.leftCount == countLeft(root.left)
-                && root.right != null ? root.right.leftCount == countLeft(root.right) : true;
+                && root.right != null ?
+                   root.right.leftCount == countLeft(root.right.left) :
+                   true;
     }
 
     private void checkFirstIndex(int firstViewIndexInParentList) {
