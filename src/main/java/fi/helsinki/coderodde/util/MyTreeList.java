@@ -191,6 +191,11 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
             return false;
         }
         final Node<E> firstNode = nodes.removeFirst();
+        if (nodes.isEmpty()) {
+            map.remove(o);
+        }
+        size--;
+        modCount++;
         firstNode.removeAt(indexOf(o));
         if (firstNode.size() == 0) {
             removeNode(firstNode);

@@ -86,6 +86,19 @@ public class MyTreeListTest {
      */
     @Test
     public void testRemove_Object() {
+        MyTreeList<Integer> list = new MyTreeList<Integer>(2);
+
+        for (int i = 0; i < 6; i++) {
+            list.add(i);
+        }
+
+        assertTrue(list.isHealthy());
+        assertEquals(6, list.size());
+        assertTrue(list.remove((Integer) 3));
+        assertEquals(5, list.size());
+        assertTrue(list.remove((Integer) 2));
+        assertEquals(4, list.size());
+        assertTrue(list.isHealthy());
     }
 
     /**
