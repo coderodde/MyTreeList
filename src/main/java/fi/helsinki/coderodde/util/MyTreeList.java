@@ -17,6 +17,7 @@ import java.util.RandomAccess;
 public class MyTreeList<E> implements List<E>, RandomAccess {
 
     public static final int ORIGINAL = -1;
+    public static boolean DEBUG = true;
     /**
      * The maximum amount of elements per a node.
      */
@@ -384,10 +385,10 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     private void fixTreeAfterRemoval(Node<E> node) {
         Node<E> p = node;
-
+        Node<E> pp = p.parent;
         while (p != null) {
             Node<E> subroot;
-            Node<E> pp = p.parent;
+            pp = p.parent;
             boolean left = (pp == null || pp.left == p);
 
             if (h(p.left) == h(p.right) + 2) {
@@ -410,6 +411,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
             if (p == root) {
                 root = subroot;
+                return;
             }
 
             if (left) {
