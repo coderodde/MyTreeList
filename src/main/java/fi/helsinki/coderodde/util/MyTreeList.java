@@ -240,17 +240,16 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 return null;
             }
             Node<E> node = root;
-            while (node != null) {
-                if (node.leftCount > index) {
-                    node = node.left;
-                } else if (node.leftCount + node.size() >= index) {
+            for (;;) {
+                if (index >= node.leftCount + node.size()) {
                     index -= node.leftCount + node.size();
                     node = node.right;
+                } else if (index < node.leftCount) {
+                    node = node.left;
                 } else {
-                    return node.get(index);
+                    return node.get(index - node.leftCount);
                 }
             }
-            throw new IllegalStateException("Should never get here!");
         } else {
             return parent.get(this.firstViewIndexInParentList + index);
         }

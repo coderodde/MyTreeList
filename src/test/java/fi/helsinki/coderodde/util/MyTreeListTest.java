@@ -150,6 +150,15 @@ public class MyTreeListTest {
         for (int i = 0; i < 10; i++) {
             assertEquals(i, (int) list.get(i));
         }
+
+        MyTreeList<Integer> list2 = new MyTreeList<Integer>(1);
+        for (int i = 0; i < 10; i++) {
+            list.add(i);
+        }
+
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i, (int) list.get(i));
+        }
     }
 
     /**
