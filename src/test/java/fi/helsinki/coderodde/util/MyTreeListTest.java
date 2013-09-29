@@ -6,6 +6,7 @@ package fi.helsinki.coderodde.util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 import org.apache.commons.collections.list.TreeList;
 import org.junit.Test;
@@ -361,6 +362,23 @@ public class MyTreeListTest {
 
         assertEquals(5000, treeList.size());
         assertTrue(treeList.isHealthy());
+    }
+
+    @Test
+    public void testRemoveAll() {
+        List<Integer> c = new LinkedList<Integer>();
+        long seed = System.currentTimeMillis();
+        System.out.println("Seed: " + seed);
+        Random r = new Random(seed);
+        MyTreeList<Integer> list = new MyTreeList<Integer>(3);
+        for (int i = 0; i < 32; i++) {
+            int number = r.nextInt();
+            list.add(number);
+            list.add(number + 1);
+            c.add(number);
+        }
+        assertTrue(list.removeAll(c));
+        assertTrue(list.isHealthy());
     }
 
     /**

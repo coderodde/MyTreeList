@@ -221,7 +221,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
     public boolean removeAll(Collection<?> c) {
         boolean changed = false;
         for (Object o : c) {
-            if (this.remove(o) == true) {
+            if (remove(o) == true) {
                 changed = true;
             }
         }

@@ -2,6 +2,8 @@ package fi.helsinki.coderodde.util;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 import org.apache.commons.collections.list.TreeList;
 
 /**
@@ -125,5 +127,18 @@ public class App
 
         System.out.println("Healthy: " + treeList.isHealthy());
         System.out.println("size: " + treeList.size());
+
+        c = new LinkedList<Integer>();
+        long seed = System.currentTimeMillis();
+        System.out.println("Seed: " + seed);
+        Random r = new Random(seed);
+        MyTreeList<Integer> list6 = new MyTreeList<Integer>(3);
+        for (int i = 0; i < 32; i++) {
+            int number = r.nextInt();
+            list6.add(number);
+            list6.add(number + 1);
+        }
+        list.removeAll(c);
+        list.isHealthy();
     }
 }
