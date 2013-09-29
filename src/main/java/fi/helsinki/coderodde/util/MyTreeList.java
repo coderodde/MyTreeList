@@ -192,7 +192,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         if (nodes == null) {
             return false;
         }
-        final Node<E> firstNode = nodes.removeFirst();
+        Node<E> firstNode = nodes.removeFirst();
         if (nodes.isEmpty()) {
             map.remove(o);
         }
@@ -200,7 +200,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         modCount++;
         firstNode.removeAt(indexOf(o));
         if (firstNode.size() == 0) {
-            removeNode(firstNode);
+            firstNode = removeNode(firstNode);
             fixTreeAfterRemoval(firstNode);
         }
         return true;
@@ -308,6 +308,10 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
                 && isWellIndexed();
     }
 
+    public boolean hasOnlyOneRootNode() {
+        return root.left == null & root.right == null;
+    }
+
     protected int getLowestActualIndex() {
         return 0;
     }
@@ -391,7 +395,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     private void fixTreeAfterRemoval(Node<E> node) {
         Node<E> p = node;
-        Node<E> pp = p.parent;
+        Node<E> pp;
         while (p != null) {
             Node<E> subroot;
             pp = p.parent;
@@ -654,7 +658,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
             if (p == null) {
                 root = child;
-                return null;
+                return node;
             }
 
             if (node == p.left) {

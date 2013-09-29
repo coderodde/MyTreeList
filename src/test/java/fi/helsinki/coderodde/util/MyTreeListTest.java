@@ -22,6 +22,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testSize() {
+        printLine();
+        System.out.println("testSize():");
         MyTreeList<String> list = new MyTreeList<String>(2);
         list.add("Hello");
         list.add("World");
@@ -34,6 +36,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testIsEmpty() {
+        printLine();
+        System.out.println("testIsEmpty():");
         MyTreeList<Integer> list = new MyTreeList<Integer>(2);
 
         assertTrue(list.isEmpty());
@@ -50,6 +54,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testContains() {
+        printLine();
+        System.out.println("testContains():");
         String yo = "Hello, y'all!";
         String sayonara = "Gomen nasai, demoo sayonara, ahondara! ^^";
         MyTreeList<String> list = new MyTreeList<String>(1);
@@ -91,6 +97,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testRemove_Object() {
+        printLine();
+        System.out.println("testRemove_Object():");
         MyTreeList<Integer> list = new MyTreeList<Integer>(2);
 
         for (int i = 0; i < 6; i++) {
@@ -117,8 +125,13 @@ public class MyTreeListTest {
         assertTrue(list.isEmpty());
     }
 
+    /**
+     * Demonstrates the performance of the add(E e) method.
+     */
     @Test
     public void testAddPerformance() {
+        printLine();
+        System.out.println("testAddPerformance():");
         final int N = 10000;
         LinkedList<Integer> linkedList = new LinkedList<Integer>();
         ArrayList<Integer> arrayList = new ArrayList<Integer>();
@@ -158,8 +171,11 @@ public class MyTreeListTest {
         System.out.println("TreeList.add():      " + (tb - ta) + " ms.");
     }
 
+
     @Test
     public void testRemoveObjectPerformance() {
+        printLine();
+        System.out.println("testRemoveObjectPerformance():");
         final int N = 10000;
         LinkedList<Integer> linkedList = new LinkedList<Integer>();
         ArrayList<Integer> arrayList = new ArrayList<Integer>();
@@ -178,7 +194,7 @@ public class MyTreeListTest {
         /*
          * 1380383696220L
          */
-        Random r = new Random(seed);
+        Random r = new Random(1380430164014L);
         Integer[] query = new Integer[N];
         for (int i = 0; i < N; i++) {
             query[i] = i;
@@ -231,6 +247,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testContainsPerformance() {
+        printLine();
+        System.out.println("testCointainsPerformance():");
         LinkedList<Integer> linkedList = new LinkedList<Integer>();
         ArrayList<Integer> arrayList = new ArrayList<Integer>();
         MyTreeList<Integer> treeList = new MyTreeList<Integer>(100);
@@ -315,6 +333,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testRemoveAllPerformance() {
+        printLine();
+        System.out.println("testRemoveAllPerformance():");
         LinkedList<Integer> linkedList = new LinkedList<Integer>();
         ArrayList<Integer> arrayList = new ArrayList<Integer>();
         MyTreeList<Integer> treeList = new MyTreeList<Integer>(100);
@@ -364,11 +384,15 @@ public class MyTreeListTest {
         assertTrue(treeList.isHealthy());
     }
 
+    /**
+     * Tests the <code>removeAll()</code> method.
+     */
     @Test
     public void testRemoveAll() {
+        printLine();
+        System.out.println("testRemoveAll():");
         List<Integer> c = new LinkedList<Integer>();
         long seed = System.currentTimeMillis();
-        System.out.println("Seed: " + seed);
         Random r = new Random(seed);
         MyTreeList<Integer> list = new MyTreeList<Integer>(3);
         for (int i = 0; i < 32; i++) {
@@ -379,6 +403,7 @@ public class MyTreeListTest {
         }
         assertTrue(list.removeAll(c));
         assertTrue(list.isHealthy());
+        assertTrue(list.size() < 64);
     }
 
     /**
@@ -393,6 +418,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testClear() {
+        printLine();
+        System.out.println("testClear():");
         MyTreeList<Integer> list = new MyTreeList<Integer>(1);
         for (int i = 0; i < 10; i++) {
             list.add(i);
@@ -410,6 +437,8 @@ public class MyTreeListTest {
      */
     @Test
     public void testGet() {
+        printLine();
+        System.out.println("testGet():");
         MyTreeList<Integer> list = new MyTreeList<Integer>(2);
         for (int i = 0; i < 10; i++) {
             list.add(i);
@@ -484,5 +513,11 @@ public class MyTreeListTest {
     @Test
     public void testIndexOf() {
 
+    }
+
+    public static void printLine() {
+        System.out.println(
+                "----------------------------------------" +
+                "----------------------------------------");
     }
 }

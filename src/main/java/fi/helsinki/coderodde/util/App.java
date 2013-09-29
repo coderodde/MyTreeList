@@ -140,5 +140,70 @@ public class App
         }
         list.removeAll(c);
         list.isHealthy();
+
+        System.out.println("testRemoveObjectPerformance():");
+        final int N = 10000;
+        LinkedList<Integer> linkedList2 = new LinkedList<Integer>();
+        ArrayList<Integer> arrayList2 = new ArrayList<Integer>();
+        MyTreeList<Integer> treeList2 = new MyTreeList<Integer>(100);
+        TreeList enemyList2 = new TreeList();
+
+        for (int i = 0; i < N; i++) {
+            linkedList2.add(i);
+            arrayList2.add(i);
+            treeList2.add(i);
+            enemyList2.add(i);
+        }
+
+        seed = System.currentTimeMillis();
+        System.out.println("Seed: " + seed);
+        /*
+         * 1380383696220L
+         */
+        r = new Random(1380430164014L);
+        Integer[] query = new Integer[N];
+        for (int i = 0; i < N; i++) {
+            query[i] = i;
+        }
+
+        for (int i = 0; i < N; i++) {
+            int from = r.nextInt(N);
+            int to = r.nextInt(N);
+            Integer tmp = query[from];
+            query[from] = query[to];
+            query[to] = tmp;
+        }
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            linkedList2.remove((Integer) query[i]);
+        }
+        tb = System.currentTimeMillis();
+        System.out.println("LinkedList.remove(Object): " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            arrayList2.remove((Integer) query[i]);
+        }
+        tb = System.currentTimeMillis();
+        System.out.println("ArrayList.remove(Object):   " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            treeList2.remove((Integer) query[i]);
+        }
+        tb = System.currentTimeMillis();
+
+        System.out.println("MyTreeList.remove(Object):  " + (tb - ta) + " ms.");
+        System.out.println("Healthy: " + treeList2.isHealthy());
+
+        ta = System.currentTimeMillis();
+        for (int i = 0; i < N; i++) {
+            enemyList2.remove((Integer) query[i]);
+        }
+        tb = System.currentTimeMillis();
+        System.out.println("TreeList.remove(Object):  " + (tb - ta) + " ms.");
+
+        System.out.println(treeList.isHealthy());
     }
 }
