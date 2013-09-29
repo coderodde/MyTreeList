@@ -18,6 +18,7 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
 
     public static final int ORIGINAL = -1;
     public static boolean DEBUG = true;
+
     /**
      * The maximum amount of elements per a node.
      */
@@ -199,9 +200,8 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
         modCount++;
         firstNode.removeAt(indexOf(o));
         if (firstNode.size() == 0) {
-            Node<E> node = removeNode(firstNode);
-            Node<E> p = node.parent;
-            fixTreeAfterRemoval(node);
+            removeNode(firstNode);
+            fixTreeAfterRemoval(firstNode);
         }
         return true;
     }
@@ -219,7 +219,13 @@ public class MyTreeList<E> implements List<E>, RandomAccess {
     }
 
     public boolean removeAll(Collection<?> c) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        boolean changed = false;
+        for (Object o : c) {
+            if (this.remove(o) == true) {
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     public boolean retainAll(Collection<?> c) {

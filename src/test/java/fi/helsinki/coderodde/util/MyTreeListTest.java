@@ -313,7 +313,54 @@ public class MyTreeListTest {
      * Test of removeAll method, of class MyTreeList.
      */
     @Test
-    public void testRemoveAll() {
+    public void testRemoveAllPerformance() {
+        LinkedList<Integer> linkedList = new LinkedList<Integer>();
+        ArrayList<Integer> arrayList = new ArrayList<Integer>();
+        MyTreeList<Integer> treeList = new MyTreeList<Integer>(100);
+        TreeList enemyList = new TreeList();
+
+        LinkedList<Integer> c = new LinkedList<Integer>();
+        boolean add = true;
+        for (int i = 0; i < 10000; i++) {
+            linkedList.add(i);
+            arrayList.add(i);
+            treeList.add(i);
+            enemyList.add(i);
+
+            if (add == true) {
+                c.add(i);
+                add = false;
+            } else {
+                add = true;
+            }
+        }
+
+        assertTrue(treeList.isHealthy());
+        assertEquals(10000, treeList.size());
+        assertFalse(treeList.isEmpty());
+
+        long ta = System.currentTimeMillis();
+        linkedList.removeAll(c);
+        long tb = System.currentTimeMillis();
+        System.out.println("LinkedList.removeAll(): " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        arrayList.removeAll(c);
+        tb = System.currentTimeMillis();
+        System.out.println("ArrayList.removeAll():  " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        treeList.removeAll(c);
+        tb = System.currentTimeMillis();
+        System.out.println("MyTreeList.removeAll():   " + (tb - ta) + " ms.");
+
+        ta = System.currentTimeMillis();
+        enemyList.removeAll(c);
+        tb = System.currentTimeMillis();
+        System.out.println("TreeList.removeAll():   " + (tb - ta) + " ms.");
+
+        assertEquals(5000, treeList.size());
+        assertTrue(treeList.isHealthy());
     }
 
     /**
